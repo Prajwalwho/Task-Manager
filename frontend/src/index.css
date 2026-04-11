@@ -1,0 +1,118 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.app {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: #1a1a2e;
+}
+
+/* Form */
+.task-form {
+  margin-bottom: 24px;
+}
+
+.task-form form {
+  display: flex;
+  gap: 10px;
+}
+
+.task-form input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.task-form input:focus {
+  border-color: #4f46e5;
+}
+
+.task-form button {
+  padding: 10px 20px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.task-form button:hover {
+  background-color: #4338ca;
+}
+
+.task-form button:disabled {
+  background-color: #a5b4fc;
+  cursor: not-allowed;
+}
+
+/* Task Item */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.task-item.completed .task-title {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+.task-title {
+  flex: 1;
+  font-size: 1rem;
+}
+
+.delete-btn {
+  padding: 6px 12px;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.delete-btn:hover {
+  background-color: #fca5a5;
+}
+
+/* States */
+.error {
+  color: #dc2626;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.loading {
+  color: #6b7280;
+}
+
+.empty-message {
+  color: #6b7280;
+  text-align: center;
+  margin-top: 40px;
+}

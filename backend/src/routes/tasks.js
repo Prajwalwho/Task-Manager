@@ -1,11 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const Task = require("../models/Task");
+const protect = require("../middleware/auth");
 
-// GET /tasks — get all tasks
+// Protect all routes below
+router.use(protect);
+
+// GET /tasks — get all tasks for logged in user
 router.get("/", async (req, res) => {
   try {
-    const tasks = await Task.find().sort({ createdAt: -1 });
+    const tasks = await Task.find({ user: req.user._id }).sort({
+      createdAt: -1,
+    });
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch tasks" });
@@ -21,7 +27,14 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Title is required" });
     }
 
-    const task = await Task.create({ title, priority, category, dueDate });
+    const task = await Task.create({
+      user: req.user._id,
+      title,
+      priority,
+      category,
+      dueDate,
+    });
+
     res.status(201).json(task);
   } catch (error) {
     res.status(500).json({ error: "Failed to create task" });
@@ -31,18 +44,24 @@ router.post("/", async (req, res) => {
 // PATCH /tasks/:id — update task
 router.patch("/:id", async (req, res) => {
   try {
-    const { completed, title, priority, category, dueDate } = req.body;
-
-    const task = await Task.findByIdAndUpdate(
-      req.params.id,
-      { completed, title, priority, category, dueDate },
-      { new: true, runValidators: true }
-    );
+    const task = await Task.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    });
 
     if (!task) {
       return res.status(404).json({ error: "Task not found" });
     }
 
+    const { completed, title, priority, category, dueDate } = req.body;
+
+    if (completed !== undefined) task.completed = completed;
+    if (title) task.title = title;
+    if (priority) task.priority = priority;
+    if (category) task.category = category;
+    if (dueDate) task.dueDate = dueDate;
+
+    await task.save();
     res.json(task);
   } catch (error) {
     res.status(500).json({ error: "Failed to update task" });
@@ -52,7 +71,10 @@ router.patch("/:id", async (req, res) => {
 // DELETE /tasks/:id — delete a task
 router.delete("/:id", async (req, res) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user._id,
+    });
 
     if (!task) {
       return res.status(404).json({ error: "Task not found" });

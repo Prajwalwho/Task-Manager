@@ -20,7 +20,7 @@ const TaskItem = ({ task, onToggle, onDelete }) => {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm mb-3"
+      className="flex items-center gap-3 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm mb-3"
     >
       {/* Drag handle */}
       <button
@@ -42,7 +42,7 @@ const TaskItem = ({ task, onToggle, onDelete }) => {
         <p
           className={`text-sm font-medium ${task.completed
               ? "line-through text-gray-400"
-              : "text-gray-700"
+              : "text-gray-700 dark:text-gray-200"
             }`}
         >
           {task.title}

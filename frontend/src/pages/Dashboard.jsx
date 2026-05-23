@@ -1,3 +1,4 @@
+import useDarkMode from "../hooks/useDarkMode";
 import { useState, useEffect } from "react";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useAuth } from "../context/AuthContext";
@@ -9,6 +10,7 @@ import * as api from "../api/tasks";
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
+    const { darkMode, toggleDarkMode } = useDarkMode();
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -29,8 +31,8 @@ const Dashboard = () => {
         loadTasks();
     }, []);
 
-    const handleAdd = async (title) => {
-        const newTask = await api.createTask(title);
+    const handleAdd = async (title, priority, category, dueDate) => {
+        const newTask = await api.createTask(title, priority, category, dueDate);
         setTasks((prev) => [newTask, ...prev]);
     };
 
@@ -70,15 +72,26 @@ const Dashboard = () => {
         );
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             {/* Navbar */}
-            <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+            <nav className="bg-white dark:bg-gray-800 shadow-sm px-6 py-4 flex justify-between items-center">
                 <h1 className="text-xl font-bold text-indigo-600">Task Manager</h1>
                 <div className="flex items-center gap-4">
-                    <span className="text-sm text-gray-600">Hi, {user.name} 👋</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                        Hi, {user.name} 👋
+                    </span>
+
+                    {/* Dark mode toggle */}
+                    <button
+                        onClick={toggleDarkMode}
+                        className="text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-lg"
+                    >
+                        {darkMode ? "☀️ Light" : "🌙 Dark"}
+                    </button>
+
                     <button
                         onClick={logout}
-                        className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg"
+                        className="text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg"
                     >
                         Logout
                     </button>

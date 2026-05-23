@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
+import { arrayMove } from "@dnd-kit/sortable";
 import { useAuth } from "../context/AuthContext";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
+import SearchBar from "../components/SearchBar";
+import FilterBar from "../components/FilterBar";
 import * as api from "../api/tasks";
 
 const Dashboard = () => {
@@ -9,6 +12,8 @@ const Dashboard = () => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [search, setSearch] = useState("");
+    const [filter, setFilter] = useState({ status: "all", priority: "all" });
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -41,6 +46,29 @@ const Dashboard = () => {
         setTasks((prev) => prev.filter((task) => task._id !== id));
     };
 
+    const handleReorder = (activeId, overId) => {
+        setTasks((prev) => {
+            const oldIndex = prev.findIndex((t) => t._id === activeId);
+            const newIndex = prev.findIndex((t) => t._id === overId);
+            return arrayMove(prev, oldIndex, newIndex);
+        });
+    };
+
+    // Filter and search logic
+    const filteredTasks = tasks
+        .filter((task) => {
+            if (filter.status === "active") return !task.completed;
+            if (filter.status === "completed") return task.completed;
+            return true;
+        })
+        .filter((task) => {
+            if (filter.priority !== "all") return task.priority === filter.priority;
+            return true;
+        })
+        .filter((task) =>
+            task.title.toLowerCase().includes(search.toLowerCase())
+        );
+
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Navbar */}
@@ -60,6 +88,9 @@ const Dashboard = () => {
             {/* Main content */}
             <div className="max-w-2xl mx-auto mt-10 px-4">
                 <TaskForm onAdd={handleAdd} />
+                <SearchBar search={search} onSearch={setSearch} />
+                <FilterBar filter={filter} onFilter={setFilter} />
+
                 {loading && (
                     <p className="text-center text-gray-400 mt-6">Loading tasks...</p>
                 )}
@@ -68,10 +99,18 @@ const Dashboard = () => {
                 )}
                 {!loading && !error && (
                     <TaskList
-                        tasks={tasks}
+                        tasks={filteredTasks}
                         onToggle={handleToggle}
                         onDelete={handleDelete}
+                        onReorder={handleReorder}
                     />
+                )}
+
+                {/* Task count */}
+                {!loading && !error && (
+                    <p className="text-center text-xs text-gray-400 mt-4">
+                        {filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""} found
+                    </p>
                 )}
             </div>
         </div>

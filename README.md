@@ -1,79 +1,198 @@
-#  Task Manager
+# Task Manager
 
-A simple **full-stack Task Manager application** built as a technical assignment to demonstrate frontend and backend development skills.
+A production-ready full-stack Task Manager application built with React, Node.js, Express, and MongoDB.
 
-The application allows users to **create, view, update, and delete tasks** with clean API integration, validation, and error handling.
+This project started as a basic internship assignment and was extended into a complete full-stack application with authentication, drag & drop functionality, filtering, dark mode, and Docker support.
 
----
-
-##  Tech Stack
-
-- **Frontend:** React + Vite
-- **Backend:** Node.js + Express
-- **Storage:** In-memory storage (data resets when backend restarts)
+The goal of this project was not just to implement CRUD operations, but to build and structure the application like a real-world production-style product.
 
 ---
 
-##  Project Structure
+# Tech Stack
+
+## Frontend
+
+- React
+- Vite
+- Tailwind CSS
+- React Router
+- Context API
+- dnd-kit
+
+## Backend
+
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+
+## Authentication & Security
+
+- JWT (jsonwebtoken)
+- bcryptjs
+
+## DevOps
+
+- Docker
+- docker-compose
+
+---
+
+# Project Structure
 
 ```text
-task-manager/
+Task_Manager/
 ├── backend/
 │   ├── src/
-│   │   ├── index.js
+│   │   ├── config/
+│   │   │   └── db.js
+│   │   ├── middleware/
+│   │   │   └── auth.js
+│   │   ├── models/
+│   │   │   ├── Task.js
+│   │   │   └── User.js
 │   │   ├── routes/
+│   │   │   ├── auth.js
 │   │   │   └── tasks.js
-│   │   └── store/
-│   │       └── taskStore.js
-│   ├── package.json
-│   └── package-lock.json
+│   │   └── index.js
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   └── package.json
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── api/
 │   │   │   └── tasks.js
 │   │   ├── components/
+│   │   │   ├── FilterBar.jsx
+│   │   │   ├── SearchBar.jsx
 │   │   │   ├── TaskForm.jsx
 │   │   │   ├── TaskItem.jsx
 │   │   │   └── TaskList.jsx
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx
+│   │   ├── hooks/
+│   │   │   └── useDarkMode.js
+│   │   ├── pages/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Login.jsx
+│   │   │   └── Register.jsx
 │   │   ├── App.jsx
 │   │   ├── main.jsx
 │   │   └── index.css
-│   ├── package.json
-│   └── package-lock.json
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   └── package.json
 │
+├── docker-compose.yml
 └── README.md
 ```
 
 ---
 
-##  Features
+# Features
 
-- View all tasks
-- Add a new task
-- Mark task as completed / incomplete
-- Delete a task
-- Loading state handling
-- Error state handling
-- Input validation
-- REST API integration
+## Authentication & Security
+
+- JWT based authentication
+- Secure password hashing using bcrypt
+- Protected routes for authenticated users only
+- User-specific private task data
+
+## Task Management
+
+- Create, update, delete, and complete tasks
+- Task priority levels (High / Medium / Low)
+- Task categories and due dates
+- Real-time search functionality
+- Status filtering (All / Active / Completed)
+- Priority filtering
+
+## User Experience
+
+- Drag & drop task reordering
+- Responsive UI
+- Persistent dark mode
+- Loading and error state handling
+- Clean dashboard interface
+
+## DevOps & Deployment
+
+- Dockerized frontend and backend
+- Multi-container setup using docker-compose
+- MongoDB Atlas cloud database
+- Environment variable configuration
 
 ---
 
-##  Setup & Run
+# Architecture Overview
 
-### Option 1 — Run both from root (if configured)
-
-```bash
-npm install
-npm run dev
+```text
+React Frontend
+       ↓
+Express REST API
+       ↓
+MongoDB Atlas Database
 ```
 
 ---
 
-### Option 2 — Run separately (recommended)
+# Setup & Run
 
-### Terminal 1 — Backend
+## Prerequisites
+
+Make sure the following are installed:
+
+- Node.js
+- npm
+- Docker Desktop
+- MongoDB Atlas account
+
+---
+
+## Environment Variables
+
+Create a `.env` file inside the `backend/` directory:
+
+```env
+PORT=3001
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_secret_key
+```
+
+---
+
+## Option 1 — Run with Docker (Recommended)
+
+From the project root folder:
+
+```bash
+docker-compose up --build
+```
+
+Frontend:
+
+```txt
+http://localhost:5173
+```
+
+Backend:
+
+```txt
+http://localhost:3001
+```
+
+To stop containers:
+
+```bash
+docker-compose down
+```
+
+---
+
+## Option 2 — Run Manually
+
+### Backend
 
 ```bash
 cd backend
@@ -83,13 +202,13 @@ node src/index.js
 
 Backend runs at:
 
-```text
+```txt
 http://localhost:3001
 ```
 
 ---
 
-### Terminal 2 — Frontend
+### Frontend
 
 ```bash
 cd frontend
@@ -99,54 +218,112 @@ npm run dev
 
 Frontend runs at:
 
-```text
+```txt
 http://localhost:5173
 ```
 
 ---
 
-## 🔌 API Endpoints
+# API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/tasks` | Get all tasks |
-| POST | `/tasks` | Create a new task |
-| PATCH | `/tasks/:id` | Update task completion status |
-| DELETE | `/tasks/:id` | Delete a task |
+## Authentication Routes
+
+| Method | Endpoint         | Description                 |
+| ------ | ---------------- | --------------------------- |
+| POST   | `/auth/register` | Register a new user         |
+| POST   | `/auth/login`    | Login and receive JWT token |
 
 ---
 
-##  Task Data Model
+## Task Routes (Protected)
+
+Requires:
+
+```txt
+Authorization: Bearer <token>
+```
+
+| Method | Endpoint     | Description                      |
+| ------ | ------------ | -------------------------------- |
+| GET    | `/tasks`     | Get all tasks for logged-in user |
+| POST   | `/tasks`     | Create a new task                |
+| PATCH  | `/tasks/:id` | Update a task                    |
+| DELETE | `/tasks/:id` | Delete a task                    |
+
+---
+
+# Task Data Model
 
 ```json
 {
-  "id": "unique-id",
+  "_id": "mongodb-object-id",
+  "user": "user-object-id",
   "title": "Complete assignment",
   "completed": false,
-  "createdAt": "2026-04-11T12:00:00.000Z"
+  "priority": "high",
+  "category": "Work",
+  "dueDate": "2026-06-01T00:00:00.000Z",
+  "createdAt": "2026-05-24T12:00:00.000Z",
+  "updatedAt": "2026-05-24T12:00:00.000Z"
 }
 ```
 
 ---
 
-##  Assumptions & Trade-offs
+# Engineering Concepts Demonstrated
 
-- Used **in-memory storage** to keep the assignment intentionally small and quick to run
-- No database integration was added as it was optional
-- No authentication was implemented since it was not part of the requirements
-- Focused more on **clean code structure, API design, and functionality** than advanced UI styling
+- Full-stack application architecture
+- REST API design
+- JWT authentication and route protection
+- MongoDB schema design using Mongoose
+- React component-based architecture
+- Global state management with Context API
+- Custom React hooks
+- Secure password hashing
+- Docker containerization
+- Environment-based configuration
+- Separation of concerns
+- Responsive UI development
+
+---
+
+# Assumptions & Trade-offs
+
+- MongoDB Atlas was used instead of local MongoDB for easier setup and cloud persistence
+- JWT tokens expire after 7 days
+- Drag & drop ordering is currently managed locally and is not persisted in the database
+- Context API was used instead of Redux to keep state management lightweight
+- Focus was placed on clean architecture and maintainability over complex animations
 
 ---
 
-##  Notes
+# Future Improvements
 
-This project was built with the goal of demonstrating:
-
-- component-based frontend structure
-- state management
-- RESTful API design
-- clean backend routing
-- validation and error handling
-- separation of concerns
+- Persist drag & drop ordering in the database
+- Add pagination for large task lists
+- Add refresh token authentication
+- Add unit and integration testing
+- Add CI/CD pipeline using GitHub Actions
+- Add task collaboration and sharing
+- Add real-time updates using Socket.IO
+- Add analytics dashboard
 
 ---
+
+# What This Project Demonstrates
+
+This project demonstrates the ability to:
+
+- Design and build a complete full-stack application
+- Implement authentication and authorization securely
+- Structure scalable frontend and backend architecture
+- Build reusable and maintainable React components
+- Work with cloud databases and REST APIs
+- Dockerize and configure applications for deployment
+- Apply clean software engineering practices
+
+---
+
+# Author
+
+Prajwal Singh
